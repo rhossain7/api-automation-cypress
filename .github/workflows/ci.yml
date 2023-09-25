@@ -1,16 +1,42 @@
-name: End-to-end tests
-on: push
+# name: End-to-end tests
+# on: push
+# jobs:
+#   cypress-run:
+#     runs-on: ubuntu-22.04
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
+#       # Install npm dependencies, cache them correctly
+#       # and run all Cypress tests
+#       - name: Cypress run
+#         uses: cypress-io/github-action@v6
+#         env:
+#             CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+#             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+
+name: E2E on Chrome
+
+on: [push]
+
 jobs:
-  cypress-run:
-    runs-on: ubuntu-22.04
+  install:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        containers: [1, 2, 3]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      # Install npm dependencies, cache them correctly
-      # and run all Cypress tests
-      - name: Cypress run
-        uses: cypress-io/github-action@v6
-        env:
-            CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/checkout@v2
 
+      - name: Cypress run
+        uses: cypress-io/github-action@v3
+        with:
+          record: true
+          parallel: true
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          # pass GitHub token to allow accurately detecting a build vs a re-run build
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
